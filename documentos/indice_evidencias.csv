@@ -1,0 +1,15 @@
+﻿Archivo_curado,Captura_origen,Seccion,Evidencia,Observacion
+01_cloudformation_create_complete.png,image(20261104-192352).png,Implementación / CloudFormation,Creación exitosa del stack fraude-tarjetas-lab (CREATE_COMPLETE),Captura real seleccionada y recortada para lectura
+02_s3_csv_upload.png,image(20261104-193316).png,Implementación / S3 RAW,Carga de CSV RAW confirmada por el script,Captura real seleccionada y recortada para lectura
+03_s3_parquet_curated.png,image(20261104-193258).png,Implementación / S3 CURATED,Dos objetos Parquet Snappy en S3 CURATED,Captura real seleccionada y recortada para lectura
+04_glue_job_console.png,image(20261104-193643).png,Implementación / Glue,Trabajo fraude-tarjetas-etl registrado en AWS Glue,Captura real seleccionada y recortada para lectura
+05_glue_etl_succeeded.png,image(20261104-193316).png,Implementación / Glue ETL,Ejecución de Glue ETL terminada en SUCCEEDED,Captura real seleccionada y recortada para lectura
+06_glue_crawler_ready.png,image(20261104-193630).png,Implementación / Glue Crawler,Crawler completado; estado READY,Captura real seleccionada y recortada para lectura
+07_athena_resumen.png,Captura de pantalla 2026-11-04 145144.png,Resultados / SQL 1,Consulta 1 Athena: 339 607 operaciones y 1 782 fraudes,Captura real seleccionada y recortada para lectura
+08_athena_noche.png,Captura de pantalla 2026-11-04 145222.png,Resultados / SQL 2,Consulta 2 Athena: tasa de fraude según es_noche,Captura real seleccionada y recortada para lectura
+09_athena_riesgo.png,Captura de pantalla 2026-11-04 145308.png,Resultados / SQL 3,Consulta 3 Athena: tasa de fraude según high_risk_cat,Captura real seleccionada y recortada para lectura
+10_dashboard_athena.png,panel_fraudcloud_inteligencia_transaccional.png,Visualización,Dashboard Streamlit con resultados exportados desde Athena,Captura real seleccionada y recortada para lectura
+11_budgets.png,Captura de pantalla 2026-11-04 153224.png,Costos / AWS Budgets,Presupuestos AWS: alcance cuenta y alerta FraudCloud,Captura real seleccionada y recortada para lectura
+12_cost_explorer.png,Captura de pantalla 2026-11-04 152821.png,Costos / Cost Explorer,Cost Explorer: consulta de costos netos al 4 de noviembre,Captura real seleccionada y recortada para lectura
+13_factura_resumen.png,Captura de pantalla 2026-11-04 154029.png,Costos / Facturas,"Factura estimada de noviembre: total neto US$ 0,00",Captura real seleccionada y recortada para lectura
+14_factura_servicios.png,Captura de pantalla 2026-11-04 154121.png,Costos / Desglose,"AWS Bills: diez servicios mostrados con importe neto US$ 0,00",Captura real seleccionada y recortada para lectura
