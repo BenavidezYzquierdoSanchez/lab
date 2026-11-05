@@ -1,0 +1,5 @@
+rango_monto,transacciones,fraudes,tasa_fraude_pct,suma_monto_winsorizado_fraude
+00 - menor a 25,123103,372,0.3022,5309.83
+01 - 25 a 99.99,153617,35,0.0228,1789.03
+02 - 100 a 299.99,55002,217,0.3945,54270.75
+03 - 300 o mas,7885,1158,14.6861,564943.57

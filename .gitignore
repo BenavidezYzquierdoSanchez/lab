@@ -1,0 +1,23 @@
+# Credenciales AWS, secretos, sesiones y datasets transaccionales crudos
+.streamlit/secrets.toml
+.env
+.env.*
+!.env.example
+.aws/
+*.pem
+*.key
+*.p12
+*credentials*
+**/__pycache__/
+.pytest_cache/
+.venv/
+venv/
+*.pyc
+.DS_Store
+# El dataset de entrada debe quedar fuera del repositorio público
+/data/real/
+*_transacciones_raw.csv
+fraude_tarjeta_credito_process.csv
+*.parquet
+# Archivos generados
+*.log
