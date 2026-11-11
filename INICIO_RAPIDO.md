@@ -6,7 +6,7 @@
 
 **Paso 2.** En GitHub, crea un repositorio llamado `fraudcloud-streamlit`.
 
-**Paso 3.** Sube los archivos y carpetas que hay dentro de `FraudCloud_Streamlit_GitHub_Deploy/`, asegurándote de que `streamlit_app.py` y `requirements.txt` queden en la raíz. No subas una carpeta externa por error.
+**Paso 3.** Sube los archivos y carpetas que hay dentro de `FraudCloud_Streamlit_2026_Actualizado/`, asegurándote de que `streamlit_app.py` y `requirements.txt` queden en la raíz. No subas una carpeta externa por error.
 
 **Paso 4.** Visita https://share.streamlit.io, inicia sesión con GitHub y pulsa **Create app**.
 
@@ -17,6 +17,10 @@
 ### Si aparece `ModuleNotFoundError`
 
 Comprueba que `requirements.txt` esté en la raíz del repositorio y que incluya Streamlit, pandas y Plotly.
+
+### Si las imágenes de seguridad o costos no aparecen
+
+Asegúrate de subir **toda** la carpeta `assets/evidencias/`. Hay **17 imágenes PNG**; las evidencias 15 y 16 son de MFA (protegidas) y la 17 corresponde al correo histórico de créditos. En la app puedes abrir **Seguridad MFA** o **Costos y créditos** para comprobarlas.
 
 ### Si aparece `FileNotFoundError`
 
@@ -40,3 +44,5 @@ python -m streamlit run streamlit_app.py
 ```
 
 Se abre normalmente en http://localhost:8501.
+
+**Estado del proyecto:** se verificaron las 17 imágenes y las ocho tablas CSV; la vista de Streamlit presenta resultados históricos y no consume AWS en vivo.

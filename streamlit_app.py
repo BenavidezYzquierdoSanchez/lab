@@ -60,6 +60,9 @@ EVIDENCE = [
     ("12_cost_explorer.png", "Cost Explorer", "Vista de costos y proyecciones en AWS."),
     ("13_factura_resumen.png", "Factura estimada", "Imagen informativa, no prueba de costo cero permanente."),
     ("14_factura_servicios.png", "Facturación por servicio", "Desglose que puede contener créditos o periodos no cerrados."),
+    ("15_mfa_configuracion_protegida.png", "MFA · configuración", "Alta de aplicación autenticadora. QR y códigos de un solo uso ocultos."),
+    ("16_mfa_registro_exitoso_protegido.png", "MFA · registro confirmado", "AWS confirma el registro de un dispositivo virtual MFA; información de recuperación omitida."),
+    ("17_correo_creditos_aws_protegido.png", "Crédito AWS · correo", "Notificación histórica del 29/10/2026: USD 69 de créditos restantes en esa fecha, no saldo actual."),
 ]
 
 
@@ -239,18 +242,28 @@ def page_pipeline() -> None:
         st.code((ROOT / "infra" / "main.yaml").read_text(encoding="utf-8"), language="yaml")
     with st.expander("Trabajo AWS Glue / glue/glue_etl.py"):
         st.code((ROOT / "glue" / "glue_etl.py").read_text(encoding="utf-8"), language="python")
-    st.caption("IAM Identity Center/MFA se configuraron en el entorno académico. "
-               "El despliegue de Community Cloud es únicamente de la aplicación de visualización.")
+    st.caption("IAM Identity Center fue configurado en el laboratorio y se documentó el registro correcto de un MFA virtual (05/11/2026). "
+               "El despliegue de Community Cloud aloja solo la aplicación de visualización, no los servicios AWS del pipeline.")
 
 
 def page_evidence() -> None:
-    st.markdown("## Galería de evidencias del proyecto")
+    st.markdown("## Galería de evidencias del proyecto · 17 capturas")
     st.caption("Capturas históricas seleccionadas del proyecto AWS (noviembre de 2026), "
                "no constituyen verificación actual de recursos encendidos.")
-    titles = [t for _f, t, _c in EVIDENCE]
-    selected = st.multiselect("Filtrar evidencias", titles, default=titles,
-                              placeholder="Seleccionar evidencias")
-    results = [e for e in EVIDENCE if e[1] in selected]
+    groups = {
+        "Todas (17)": range(1, 18),
+        "Implementación AWS (1–6)": range(1, 7),
+        "Resultados y dashboard (7–10)": range(7, 11),
+        "Costos, facturas y créditos (11–14, 17)": [11, 12, 13, 14, 17],
+        "Seguridad MFA (15–16)": [15, 16],
+    }
+    choice = st.selectbox("Categoría de evidencias", list(groups), key="evidence_group")
+    allowed = set(groups[choice])
+    group_results = [e for i, e in enumerate(EVIDENCE, start=1) if i in allowed]
+    titles = [t for _f, t, _c in group_results]
+    selected = st.multiselect("Filtrar evidencias de la categoría", titles, default=titles,
+                              placeholder="Seleccionar evidencias", key=f"evidence_filter_{choice}")
+    results = [e for e in group_results if e[1] in selected]
     if not results:
         st.info("Selecciona al menos una evidencia.")
         return
@@ -261,11 +274,118 @@ def page_evidence() -> None:
             with col:
                 st.markdown(f"#### {name}")
                 image_path = ROOT / "assets" / "evidencias" / filename
-                if image_path.exists():
-                    st.image(str(image_path), width="stretch")
+                if image_path.is_file():
+                    try:
+                        st.image(image_path.read_bytes(), width="stretch")
+                    except (OSError, ValueError) as exc:
+                        st.error(f"Imagen dañada: {filename}: {exc}")
+                else:
+                    st.error(f"No está disponible: assets/evidencias/{filename}")
                 st.caption(explanation)
     st.warning("Antes de publicar capturas en un repositorio público, revisa IDs de cuenta, "
                "datos personales y cualquier información sensible. Nunca publiques QR de MFA ni tokens.")
+
+
+
+
+def show_evidence(filename: str, heading: str, explanation: str, *, large: bool = False) -> None:
+    """Visualiza PNG del repositorio sin depender de enlaces externos ni URLs de AWS.
+
+    En Streamlit Community Cloud los archivos se encuentran relativos al archivo fuente,
+    no respecto al directorio desde el que navega el usuario.
+    """
+    st.markdown(f"#### {heading}")
+    path = ROOT / "assets" / "evidencias" / filename
+    if not path.is_file():
+        st.error(f"No se encontró la evidencia local: {filename}. Verifica que assets/evidencias esté en GitHub.")
+        return
+    try:
+        # Enviar bytes a Streamlit, no una URL relativa rota en un iframe.
+        st.image(path.read_bytes(), width="stretch", caption=explanation)
+    except (OSError, ValueError) as exc:
+        st.error(f"No se pudo abrir {filename}: {exc}")
+    if large:
+        st.download_button("⬇️ Descargar imagen PNG", path.read_bytes(),
+                           file_name=filename, mime="image/png", key=f"png_{filename}")
+
+
+def page_security() -> None:
+    st.markdown("## 🔐 Seguridad y autenticación multifactor")
+    st.markdown("""La consola de AWS mostró **la asignación exitosa de un MFA virtual**. Se incluyen
+    únicamente capturas protegidas, sin el QR ni códigos temporales. La evidencia confirma
+    el registro del dispositivo que aparece en la pantalla, pero **no demuestra por sí sola**
+    que todos los usuarios o identidades IAM tengan MFA habilitado.""")
+    c1, c2, c3 = st.columns(3, gap="medium")
+    with c1:
+        card("Identidad", "IAM Identity Center",
+             "SSO con conjunto de permisos FraudCloud-Lab-Admin en el laboratorio. No confundir con la cuenta raíz.")
+    with c2:
+        card("Segundo factor", "MFA virtual registrado",
+             "La consola AWS informó la asignación exitosa del dispositivo autenticador.")
+    with c3:
+        card("Protección", "Credenciales ocultas",
+             "QR, clave secreta, códigos de un solo uso y recuperación no se publican.")
+    left, right = st.columns(2, gap="large")
+    with left:
+        show_evidence("15_mfa_configuracion_protegida.png", "Evidencia 15 · Configuración MFA",
+                      "Flujo de asociación de autenticador; QR y códigos protegidos.", large=True)
+    with right:
+        show_evidence("16_mfa_registro_exitoso_protegido.png", "Evidencia 16 · Dispositivo asignado",
+                      "Mensaje de AWS que confirma el alta del MFA virtual; datos de recuperación protegidos.", large=True)
+    st.info("**Buenas prácticas:** confirmar el MFA para las identidades relevantes, aplicar mínimo privilegio, "
+            "revisar permisos y habilitar registros de auditoría según alcance del laboratorio.", icon="ℹ️")
+
+
+def page_finops() -> None:
+    st.markdown("## 💰 Costos, presupuestos y créditos AWS")
+    st.markdown("**No mezclar conceptos:** el correo de créditos, las facturas, los presupuestos "
+                "y las estimaciones de precios reflejan información diferente y de fechas distintas.")
+    c1, c2, c3 = st.columns(3, gap="medium")
+    with c1:
+        card("Presupuesto", "Alertas, no bloqueo",
+             "AWS Budgets emite notificaciones al alcanzar umbrales; por sí solo no impide gastos adicionales.")
+    with c2:
+        card("Histórico", "Facturas y Cost Explorer",
+             "Importes históricos según las fechas y el método de visualización de cada captura.")
+    with c3:
+        card("Crédito promocional", "USD 69 al 29/10/2026",
+             "Es el saldo indicado en un correo histórico, no una consulta actual ni el crédito disponible hoy.")
+    st.markdown("### Evidencia 17 · Notificación de créditos promocionales")
+    a, b = st.columns([1,1], gap="large")
+    with a:
+        show_evidence("17_correo_creditos_aws_protegido.png", "Correo de AWS Billing",
+                      "Notificación recibida el 29/10/2026: 69 USD restantes en ese momento.", large=True)
+    with b:
+        st.markdown("""#### Interpretación
+        El correo confirma que AWS **informó un saldo promocional de USD 69** en octubre de 2026.
+        No debe utilizarse para afirmar que ese es el saldo actual. El beneficio depende
+        de las condiciones del plan y de su vigencia.
+
+        En la documentación académica se deben distinguir:
+        - **Crédito promocional:** beneficio de facturación sujeto a condiciones.
+        - **Presupuesto:** umbral de seguimiento o alerta, no restricción del servicio.
+        - **Factura / Cost Explorer:** importes que pueden reflejar créditos, periodos o filtros diferentes.
+        - **Pricing Calculator:** proyecciones hipotéticas, no cargos efectivamente facturados.
+        """)
+        st.warning("Para verificar el saldo vigente o los cargos actuales, consulta AWS Billing con una sesión autorizada.")
+    st.markdown("### Evidencias del control de costos")
+    finops = [
+        ("11_budgets.png", "Evidencia 11 · AWS Budgets",
+         "Presupuestos configurados durante el laboratorio."),
+        ("12_cost_explorer.png", "Evidencia 12 · Cost Explorer",
+         "Vista histórica de costos según intervalo y agrupación seleccionados."),
+        ("13_factura_resumen.png", "Evidencia 13 · Factura estimada",
+         "Total visible en el periodo y filtros que aparecen en la captura; no implica gasto cero permanente."),
+        ("14_factura_servicios.png", "Evidencia 14 · Desglose de facturación",
+         "Importes de servicios visibles en la consulta histórica."),
+    ]
+    for i in range(0, len(finops), 2):
+        c1, c2 = st.columns(2, gap="large")
+        for col, (filename, heading, description) in zip([c1, c2], finops[i:i+2]):
+            with col:
+                show_evidence(filename, heading, description)
+    st.caption("Las evidencias corresponden a distintas consultas de octubre y noviembre de 2026. "
+               "Las capturas no permiten consolidar por sí solas un saldo ni un costo actual.")
 
 
 def page_project() -> None:
@@ -286,10 +406,10 @@ def page_project() -> None:
 ├── data/
 │   ├── athena_results/         # 8 resultados exportados de AWS
 │   └── local_preview/          # 8 agregados calculados localmente
-├── assets/evidencias/          # Capturas del proyecto
+├── assets/evidencias/          # 17 capturas, incluidas MFA y créditos
 ├── assets/diagramas/           # Diagrama y gráficos
 ├── presentacion/               # Presentación HTML independiente
-├── docs/                       # Informe final PDF
+├── docs/                       # Informe profesional PDF y Word
 ├── sql/                        # 8 consultas SQL
 ├── glue/                       # Código Glue ETL
 ├── infra/                      # CloudFormation main.yaml
@@ -304,10 +424,15 @@ def page_project() -> None:
                 "Abre [share.streamlit.io](https://share.streamlit.io), selecciona repositorio, "
                 "rama `main` y archivo principal `streamlit_app.py`. Pulsa **Deploy**.")
     st.info("No se necesitan variables de entorno ni AWS Secrets para mostrar los CSV incluidos.")
-    pdf_file = ROOT / "docs" / "Informe_Final_FraudCloud_2026.pdf"
-    if pdf_file.exists():
-        st.download_button("📄 Descargar informe final en PDF", pdf_file.read_bytes(),
-                           file_name="Informe_Final_FraudCloud_2026.pdf", mime="application/pdf")
+    pdf_file = ROOT / "docs" / "Informe_FraudCloud_2026_Completo_MFA_Creditos.pdf"
+    docx_file = ROOT / "docs" / "Informe_FraudCloud_2026_Completo_MFA_Creditos.docx"
+    if pdf_file.is_file():
+        st.download_button("📄 Descargar informe profesional PDF", pdf_file.read_bytes(),
+                           file_name=pdf_file.name, mime="application/pdf")
+    if docx_file.is_file():
+        st.download_button("📝 Descargar informe Word editable", docx_file.read_bytes(),
+                           file_name=docx_file.name,
+                           mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
     st.markdown("### Limitaciones técnicas y recomendaciones")
     st.markdown("El despliegue **no actualiza Athena automáticamente**. Para incorporar nuevos resultados, "
                 "ejecutar `scripts/actualizar_athena.py` en un equipo autorizado y subir los CSV actualizados. "
@@ -317,7 +442,7 @@ def page_project() -> None:
 def page_presentation() -> None:
     st.markdown("## Presentación HTML del proyecto")
     st.caption("Incluye el pipeline, evidencias, comparativas, código y la pestaña de app de tarjetas. "
-               "La presentación es estática e independiente de la ejecución de Streamlit.")
+               "Las 17 evidencias, incluidas MFA y créditos protegidos, están embebidas en el HTML autónomo.")
     src = ROOT / "presentacion" / "FraudCloud_Presentacion.html"
     if not src.exists():
         st.warning("No se incluyó la presentación HTML.")
@@ -327,8 +452,8 @@ def page_presentation() -> None:
                        data=raw, file_name="FraudCloud_Presentacion.html", mime="text/html")
     if st.toggle("Mostrar presentación dentro de Streamlit", value=False):
         components.html(raw.decode("utf-8", errors="replace"), height=780, scrolling=True)
-    st.info("Para usar pantalla completa real, descarga el HTML, ábrelo en el navegador y "
-            "utiliza su botón de pantalla completa o la tecla F11.")
+    st.info("La vista integrada está dentro de un marco. Para pantalla completa, abre el HTML "
+            "descargado y utiliza su botón de pantalla completa o F11.")
 
 
 # -- Aplicación --
@@ -338,13 +463,15 @@ with st.sidebar:
     st.divider()
     page = st.radio("MENÚ", ["📊 Resumen", "📈 Análisis interactivo", "🧾 Datos y SQL",
                             "☁️ Pipeline y arquitectura", "🖼️ Evidencias",
+                            "🔐 Seguridad MFA", "💰 Costos y créditos",
                             "🧩 Proyecto y despliegue", "🖥️ Presentación HTML"],
                     label_visibility="collapsed")
     st.divider()
     source = st.selectbox("Origen de resultados", list(SOURCES), index=0)
     theme = st.selectbox("Color del dashboard", list(PALETTES), index=0)
     st.caption("🌐 Publicable en Streamlit Community Cloud")
-    st.caption("📆 Resultados del proyecto: 04/11/2026")
+    st.caption("📆 Resultados de Athena: 04/11/2026")
+    st.caption("🛡️ MFA y crédito documentados con imágenes protegidas")
     st.caption("📌 Datos batch exportados; no actualización en vivo")
 
 primary, dark, pale = PALETTES[theme]
@@ -382,10 +509,15 @@ elif page == "☁️ Pipeline y arquitectura":
     page_pipeline()
 elif page == "🖼️ Evidencias":
     page_evidence()
+elif page == "🔐 Seguridad MFA":
+    page_security()
+elif page == "💰 Costos y créditos":
+    page_finops()
 elif page == "🧩 Proyecto y despliegue":
     page_project()
 elif page == "🖥️ Presentación HTML":
     page_presentation()
 
 st.divider()
-st.caption("FraudCloud 2026 · Proyecto académico · El dashboard muestra agregados históricos y no procesa tarjetas reales en tiempo real.")
+st.caption("FraudCloud 2026 · Docente: Milton Edward Humpiri Flores · Estudiante: Benavidez Yzquierdo Sanchez · "
+           "Proyecto académico con CSV históricos, no monitoreo bancario en vivo.")

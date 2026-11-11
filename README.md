@@ -57,9 +57,11 @@ En Linux o macOS se activa con `source .venv/bin/activate`.
 - **Análisis interactivo**: siete dimensiones, selección de tasa/conteo y exportación CSV.
 - **Datos y SQL**: controles de calidad, ocho consultas y tablas originales exportadas.
 - **Pipeline y arquitectura**: diagrama, fases, plantilla CloudFormation y código Glue.
-- **Evidencias**: catorce capturas elegidas del proyecto.
+- **Evidencias**: 17 capturas seleccionadas; filtros por etapa, resultados, costos y seguridad.
+- **Seguridad MFA**: imágenes protegidas de la configuración y del registro exitoso de un MFA virtual.
+- **Costos y créditos**: facturación histórica, AWS Budgets, Cost Explorer y correo del 29/10/2026 con USD 69 disponibles **en esa fecha**, no saldo actual.
 - **Proyecto y despliegue**: carpetas, dependencias, guía, informe PDF.
-- **Presentación HTML**: HTML autónomo descargable, con visualización integrada opcional.
+- **Presentación HTML**: HTML autónomo actualizado con las 17 evidencias, la pestaña de app de tarjetas y botón de pantalla completa; visualización integrada opcional.
 
 ## 4. Estructura técnica
 
@@ -73,8 +75,8 @@ data/athena_results/         # 8 CSV exportados de Athena
 data/local_preview/          # 8 CSV locales, correctamente etiquetados
 assets/evidencias/          # Capturas de pantalla del proyecto
 assets/diagramas/           # Arquitectura AWS
-presentacion/               # Presentación HTML independiente
-docs/                       # Informe final en PDF
+presentacion/               # Presentación HTML corregida y autónoma
+docs/                       # Informe profesional completo PDF + Word
 sql/                        # Consultas Athena
 infra/                      # CloudFormation
 glue/                       # Script ETL
@@ -113,3 +115,20 @@ python -m pytest -q tests
 ```
 
 Si aparece un error de importación de Streamlit en tu PC, instala las dependencias del `requirements.txt` en el Python que usas para correr la app.
+
+
+### Evidencias MFA (05/11/2026)
+
+La galería contiene las capturas 15 y 16 del alta de un autenticador virtual y del mensaje de AWS que confirma su asignación exitosa. En la versión publicable se **ocultan** QR de enrolamiento, claves, códigos temporales, correo y teléfono de recuperación. El PDF completo actualizado se encuentra en `docs/Informe_FraudCloud_2026_MFA_Validado.pdf`. Estas evidencias no demuestran que MFA sea obligatorio para todos los usuarios.
+
+
+## Actualización de seguridad y FinOps · 11/11/2026
+
+- Se incorporó **Evidencia 17**, correo AWS Billing del **29/10/2026**. Los **USD 69** son un saldo histórico comunicado entonces, no el saldo actual.
+- Se mantienen evidencias **15** y **16** (configuración y alta de MFA virtual) con QR, códigos y detalles de recuperación protegidos.
+- Se agregaron páginas nativas de Streamlit **Seguridad MFA** y **Costos y créditos**, con carga local robusta de imágenes (sin URLs relativas ni conexión a AWS).
+- La pestaña de presentación incluye el HTML corregido, con las imágenes protegidas incrustadas y acceso a la app didáctica de tarjetas.
+- Se sustituyó el informe anterior por el informe profesional más reciente en **PDF y DOCX**.
+- La app **no consulta AWS en tiempo real**. La publicación de estas evidencias no valida un saldo vigente ni implica que el MFA esté aplicado a todas las identidades.
+
+**Antes de hacer público el repositorio**, revisa cuidadosamente también las evidencias históricas 1–14 y los documentos. No incluyas claves, tokens, tarjetas reales, números completos de cuenta, correos personales ni datos de recuperación de MFA.
